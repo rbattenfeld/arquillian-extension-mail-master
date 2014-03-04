@@ -25,30 +25,29 @@ import org.jboss.arquillian.test.spi.event.suite.TestLifecycleEvent;
 /**
  * ExtractScriptUtil
  * 
- * @author <a href="mailto:aslak@redhat.com">Aslak Knutsen</a>
+ * @author <a href="mailto:ralf.battenfeld@bluewin.ch">Ralf Battenfeld</a>
  * @version $Revision: $
  */
 public final class ExtractSetupUtil {
 	
-	public static MailServerSetup extractSetup(final ClassLifecycleEvent event) {
+	public static MailServerSetup extractServerSetupFromTestClass(final ClassLifecycleEvent event) {
 		final MailServerSetup setup = event.getTestClass().getAnnotation(MailServerSetup.class);
 		return setup;
 	}
 
-	public static MailServerSetup extractSetup(TestLifecycleEvent event) {
+	public static MailServerSetup extractServerSetupFromTestClass(TestLifecycleEvent event) {
 		final MailServerSetup setup = event.getTestClass().getAnnotation(MailServerSetup.class);
 		return setup;
 	}
 
-
-	public static MailTest extractTest(final TestLifecycleEvent event) {
+	public static MailTest extractMailTestFromTestMethod(final TestLifecycleEvent event) {
 		MailTest test = event.getTestMethod().getAnnotation(MailTest.class);
 		return test;
 	}
 
-//	public static MailTest extractTest(TestLifecycleEvent event) {
-//		final MailTest test = event.getTestClass().getAnnotation(MailTest.class);
-//		return test;
-//	}
+	public static MailServerSetup extractServerSetupFromTestMethod(final TestLifecycleEvent event) {
+		MailServerSetup test = event.getTestMethod().getAnnotation(MailServerSetup.class);
+		return test;
+	}
 	
 }

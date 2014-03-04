@@ -16,7 +16,12 @@
  */
 package org.jboss.arquillian.extension.mail.impl.client;
 
+import java.util.List;
+
+import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+
+import junit.framework.Assert;
 
 import org.jboss.arquillian.config.descriptor.api.ArquillianDescriptor;
 import org.jboss.arquillian.core.api.Instance;
@@ -43,37 +48,16 @@ public class MailServerInstaller {
 
 	/** The class GreenMail instance */
 	private GreenMail greenMailClassInstance = null;
-	
-	/** The method GreenMail instance */
-	private GreenMail greenMailMethodInstance = null;
-	
+		
 	private MailTest mailTest = null;
 
 	@Inject
 	private Instance<ArquillianDescriptor> descriptorInst;
 
 	public void installClass(@Observes BeforeClass event) {
-		final MailServerSetup setup = ExtractSetupUtil.extractSetup(event);
+		final MailServerSetup setup = ExtractSetupUtil.extractServerSetupFromTestClass(event);
 		if (setup != null) {
 			greenMailClassInstance = setupServer(setup); 
-//			if (setup.protocols() != null) {
-//				final ServerSetup[] serverSetup = getSetup(setup.protocols());
-//				greenMailClassInstance = new GreenMail(serverSetup);
-//				greenMailClassInstance.start();
-//			}
-//			
-//			if (setup.users() != null) {
-//				for (String userItem : setup.users()) {
-//					final String[] items = userItem.split(":", -1);
-//					if (items.length == 2) {
-//						greenMailClassInstance.setUser(items[0], items[1]);
-//					} else if(items.length == 3) {
-//						greenMailClassInstance.setUser(items[0], items[1], items[2]);
-//					} else {
-//						throw new RuntimeException("User setup wrong - TODO better here");
-//					}
-//				}
-//			}
 		}
 	}
 
@@ -84,33 +68,35 @@ public class MailServerInstaller {
 	}
 	
 	public void installMethod(@Observes Before event) {
-		final MailServerSetup setup = ExtractSetupUtil.extractSetup(event);
-		if (setup != null) {
-			greenMailMethodInstance = setupServer(setup);
-		}
-		mailTest = ExtractSetupUtil.extractTest(event);
+		mailTest = ExtractSetupUtil.extractMailTestFromTestMethod(event);
 	}
 	
 	public void uninstallMethod(@Observes After event) {
 		if (mailTest != null) {
-			if (isEmpty(mailTest.sentTo()) && isEmpty(mailTest.sentFrom())) {
-				final int expectedCount = mailTest.messageCount();
-				final MimeMessage[] messages = greenMailClassInstance.getReceivedMessages();
-				if (messages != null) {
-					if (expectedCount != messages.length) {
-						throw new RuntimeException("");
-					}
-				} else {
-					if (expectedCount != 0) {
-						throw new RuntimeException("");
-					}
-				}
+			try {
+				final FilterChain chain = new FilterChain();
+				final MimeMessage[] messages = greenMailClassInstance.getReceivedMessages();			
+				final List<MimeMessage> messagesFiltered = chain.filter(mailTest, messages);				
+				Assert.assertTrue(mailTest.messageCount() == messagesFiltered.size());				
+			} catch (MessagingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
+			
+//			if (isEmpty(mailTest.sentTo()) && isEmpty(mailTest.sentFrom())) {
+//				final int expectedCount = mailTest.messageCount();
+//				final MimeMessage[] messages = greenMailClassInstance.getReceivedMessages();
+//				if (messages != null) {
+//					if (expectedCount != messages.length) {
+//						throw new RuntimeException("");
+//					}
+//				} else {
+//					if (expectedCount != 0) {
+//						throw new RuntimeException("");
+//					}
+//				}
+//			}
 			mailTest = null;
-		}
-		
-		if (greenMailMethodInstance != null) {
-			greenMailMethodInstance.stop();
 		}
 	}
 	
@@ -163,4 +149,5 @@ public class MailServerInstaller {
 			return false;
 		}
 	}
+	
 }

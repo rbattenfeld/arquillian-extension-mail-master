@@ -32,6 +32,11 @@ import java.lang.annotation.Target;
 @Target({ ElementType.METHOD })
 public @interface MailTest {
     public int messageCount();
-    public String sentTo() default "";
-    public String sentFrom() default "";;
+    public String[] sentTo() default "";
+    public String sentFrom() default "";
+    public boolean clear() default false;
+    public boolean verbose() default false;
+    public boolean checkAttachementExists() default false;
+    public String matchSubject();
+    public String contentType() default "text/plain";
 }

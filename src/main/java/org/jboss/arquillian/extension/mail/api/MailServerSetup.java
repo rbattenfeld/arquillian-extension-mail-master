@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
  * @author <a href="mailto:ralf.battenfeld@bluewin.ch">Ralf Battenfeld</a>
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD, ElementType.TYPE })
+@Target({ ElementType.TYPE })
 public @interface MailServerSetup {
 	public String host() default "localhost";
 	public String[] protocols() default "smtp:3025";

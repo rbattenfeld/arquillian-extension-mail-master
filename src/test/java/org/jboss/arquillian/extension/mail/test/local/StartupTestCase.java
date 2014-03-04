@@ -36,13 +36,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Test Case for {@link BMRule} on Method level Local protocol
+ * Test Case for {@link @MailServerSetup} on class level Local protocol
  * 
- * Requires containers that use Local protocol, Weld | OpenEJB | IronJacamar |
- * OpenWebBeans
- * 
- * @author <a href="mailto:aslak@redhat.com">Aslak Knutsen</a>
- * @version $Revision: $
+ * @author <a href="mailto:ralf.battenfeld@bluewin.ch">Ralf Battenfeld</a>
  */
 @RunWith(Arquillian.class)
 @MailServerSetup(protocols = {"smtp:3025"}, users= {"john.doe@testmail.com:mypasswd", "testUser1@noreply:mypasswd"})
@@ -55,13 +51,30 @@ public class StartupTestCase {
 				.addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
 	}
 
-	@Resource(mappedName = "java:jboss/mail/testMail")
-	private Session mailSession;
+	@Resource(mappedName = "java:jboss/mail/testMail1")
+	private Session mailSession1;	
+
 	
 	@Test
-	@MailTest(messageCount = 1)
-	public void shouldBeAbleToInjectMethodLevelThrowRule() throws Exception {
-		final MimeMessage m = new MimeMessage(mailSession);
+	@MailTest(messageCount = 1, matchSubject = "Wildfly Mail", contentType = "text/plain; charset=us-ascii", verbose = true)
+	public void firstTest() throws Exception {
+		final MimeMessage m = new MimeMessage(mailSession1);
+		final Address from = new InternetAddress("testUser1@noreply");
+		final Address[] to = new InternetAddress[] { new InternetAddress("john.doe@testmail.com") };
+
+		m.setFrom(from);
+		m.setRecipients(Message.RecipientType.TO, to);
+		m.setSubject("Wildfly Mail");
+		m.setSentDate(new java.util.Date());
+		m.setContent("Mail sent from Wildfly ", "text/plain");
+		Transport.send(m);
+	}
+	
+
+	@Test
+	@MailTest(messageCount = 1, matchSubject = "JBoss AS 7 Mail", contentType = "text/plain; charset=us-ascii", verbose = true)
+	public void secondTest() throws Exception {
+		final MimeMessage m = new MimeMessage(mailSession1);
 		final Address from = new InternetAddress("testUser1@noreply");
 		final Address[] to = new InternetAddress[] { new InternetAddress("john.doe@testmail.com") };
 

@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	
+
 	<parent>
 		<groupId>org.jboss</groupId>
 		<artifactId>jboss-parent</artifactId>
@@ -20,11 +20,11 @@
 	<description>Mail integration for the Arquillian project</description>
 	<version>1.0.0.Alpha-SNAPSHOT</version>
 
-<!-- 	<scm> -->
-<!-- 		<connection>scm:git:git://git@github.com:arquillian/arquillian-extension-mail.git</connection> -->
-<!-- 		<developerConnection>scm:git:ssh://github.com/arquillian/arquillian-extension-mail.git</developerConnection> -->
-<!-- 		<url>git://github.com/arquillian/arquillian-extension-mail.git</url> -->
-<!-- 	</scm> -->
+	<!-- <scm> -->
+	<!-- <connection>scm:git:git://git@github.com:arquillian/arquillian-extension-mail.git</connection> -->
+	<!-- <developerConnection>scm:git:ssh://github.com/arquillian/arquillian-extension-mail.git</developerConnection> -->
+	<!-- <url>git://github.com/arquillian/arquillian-extension-mail.git</url> -->
+	<!-- </scm> -->
 
 	<!-- Properties -->
 	<properties>
@@ -40,8 +40,8 @@
 		<version.log4j>1.2.14</version.log4j>
 		<version.slf4j>1.7.2</version.slf4j>
 		<version.byteman>2.1.3</version.byteman>
-        <version.wildfly>8.0.0.Beta1</version.wildfly>
-<!-- 		<path.tools_jar>${java.home}/../lib/tools.jar</path.tools_jar> -->
+		<version.wildfly>8.0.0.Beta1</version.wildfly>
+		<!-- <path.tools_jar>${java.home}/../lib/tools.jar</path.tools_jar> -->
 		<!-- <path.tools_jar>/usr/lib/jvm/java-6-openjdk/lib/tools.jar</path.tools_jar> -->
 
 		<!-- override from parent -->
@@ -133,7 +133,12 @@
 			<version>1.3.1b</version>
 		</dependency>
 
-		<!-- Test -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.2.1</version>
+		</dependency>
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -145,6 +150,7 @@
 			<artifactId>arquillian-junit-container</artifactId>
 			<scope>test</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>org.jboss.arquillian.protocol</groupId>
 			<artifactId>arquillian-protocol-servlet</artifactId>

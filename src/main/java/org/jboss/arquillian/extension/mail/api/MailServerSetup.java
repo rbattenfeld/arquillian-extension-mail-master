@@ -31,7 +31,45 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
 public @interface MailServerSetup {
+	
 	public String host() default "localhost";
+	
+	/**
+	 * Defines protocols. The format is [<potocol>:port];[<protocol>:port]...
+	 * <p>
+	 * The supported protocols are:
+	 * <ul>
+	 * <li> smtp
+	 * <li> smtps
+ 	 * <li> pop3
+	 * <li> pop3s
+ 	 * <li> imap
+	 * <li> imaps
+	 * </ul>
+	 * 
+	 * example:
+	 * <pre>
+	 * <code> protocols = { "smtp:3025", "pop3:3110" }  </code>
+	 * </pre>
+	 * 
+	 * @return
+	 */
 	public String[] protocols() default "smtp:3025";
+	
+	/**
+	 * Initializes the mail server with user accounts. The format is:
+	 * <p>
+	 * <ul> 
+	 * <li> users = {"email-address1:passwd1", "email-address2:passwd2"} or
+	 * <li> users = {"email-address1:login1:passwd1", "email-address2:login2:passwd2"} or
+	 * </ul>
+	 * 
+	 * example:
+	 * <pre>
+	 * <code> users= { "john.doe@testmail.com:mypasswd", "testUser1@noreply:mypasswd" }  </code>
+	 * </pre>
+	 * 
+	 * @return
+	 */
 	public String[] users() default "";
 }

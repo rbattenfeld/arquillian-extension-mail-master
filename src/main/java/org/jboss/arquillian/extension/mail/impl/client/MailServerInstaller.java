@@ -16,25 +16,24 @@
  */
 package org.jboss.arquillian.extension.mail.impl.client;
 
-import java.util.List;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-
-import junit.framework.Assert;
+import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.logging.Logger;
 
 import org.jboss.arquillian.config.descriptor.api.ArquillianDescriptor;
 import org.jboss.arquillian.core.api.Instance;
+import org.jboss.arquillian.core.api.InstanceProducer;
 import org.jboss.arquillian.core.api.annotation.Inject;
 import org.jboss.arquillian.core.api.annotation.Observes;
 import org.jboss.arquillian.extension.mail.api.MailServerSetup;
-import org.jboss.arquillian.extension.mail.api.MailTest;
 import org.jboss.arquillian.extension.mail.impl.common.ExtractSetupUtil;
-import org.jboss.arquillian.test.spi.event.suite.After;
+import org.jboss.arquillian.test.spi.annotation.SuiteScoped;
 import org.jboss.arquillian.test.spi.event.suite.AfterClass;
-import org.jboss.arquillian.test.spi.event.suite.Before;
 import org.jboss.arquillian.test.spi.event.suite.BeforeClass;
 
+import com.icegreen.greenmail.store.MailFolder;
+import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 
@@ -46,57 +45,35 @@ import com.icegreen.greenmail.util.ServerSetup;
  */
 public class MailServerInstaller {
 
-	/** The class GreenMail instance */
-	private GreenMail greenMailClassInstance = null;
-		
-	private MailTest mailTest = null;
+	private static final Logger log = Logger.getLogger(MailServerInstaller.class.getName());
+	
+	private ConcurrentMap<String, GreenMailUser> userMap = new ConcurrentHashMap<String, GreenMailUser>();
+	
+	private GreenMail greenMail = null;
 
+	@Inject @SuiteScoped
+	private InstanceProducer<GreenMail> greenMailProxy;	  
+	
 	@Inject
 	private Instance<ArquillianDescriptor> descriptorInst;
 
 	public void installClass(@Observes BeforeClass event) {
 		final MailServerSetup setup = ExtractSetupUtil.extractServerSetupFromTestClass(event);
 		if (setup != null) {
-			greenMailClassInstance = setupServer(setup); 
+			greenMail = setupServer(setup); 
+			greenMailProxy.set(greenMail);
 		}
 	}
 
 	public void installClass(@Observes AfterClass event) {
-		if (greenMailClassInstance != null) {
-			greenMailClassInstance.stop();
+		if (greenMail != null) {
+			greenMail.stop();
 		}
 	}
-	
-	public void installMethod(@Observes Before event) {
-		mailTest = ExtractSetupUtil.extractMailTestFromTestMethod(event);
-	}
-	
-	public void uninstallMethod(@Observes After event) {
-		if (mailTest != null) {
-			try {
-				final FilterChain chain = new FilterChain();
-				final MimeMessage[] messages = greenMailClassInstance.getReceivedMessages();			
-				final List<MimeMessage> messagesFiltered = chain.filter(mailTest, messages);				
-				Assert.assertTrue(mailTest.messageCount() == messagesFiltered.size());				
-			} catch (MessagingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-//			if (isEmpty(mailTest.sentTo()) && isEmpty(mailTest.sentFrom())) {
-//				final int expectedCount = mailTest.messageCount();
-//				final MimeMessage[] messages = greenMailClassInstance.getReceivedMessages();
-//				if (messages != null) {
-//					if (expectedCount != messages.length) {
-//						throw new RuntimeException("");
-//					}
-//				} else {
-//					if (expectedCount != 0) {
-//						throw new RuntimeException("");
-//					}
-//				}
-//			}
-			mailTest = null;
+		
+	public void mailEventListener(@Observes MailTestEvent event) {
+		if (MailTestEvent.DeleteAllMails == event) {
+			deleteAllMails();
 		}
 	}
 	
@@ -113,13 +90,18 @@ public class MailServerInstaller {
 		
 			if (setup.users() != null) {
 				for (String userItem : setup.users()) {
+					GreenMailUser user = null;
 					final String[] items = userItem.split(":", -1);
 					if (items.length == 2) {
-						server.setUser(items[0], items[1]);
+						user = server.setUser(items[0], items[1]);						
 					} else if(items.length == 3) {
 						server.setUser(items[0], items[1], items[2]);
 					} else {
 						throw new RuntimeException("User setup wrong - TODO better here");
+					}
+					
+					if (user != null) {
+						userMap.putIfAbsent(user.getEmail(), user);
 					}
 				}
 			}
@@ -135,19 +117,32 @@ public class MailServerInstaller {
 			if (subitem.length == 2) {
 				final String protocol = subitem[0];
 				final String port = subitem[1];
-				protocolSetups[i] = new ServerSetup(Integer.valueOf(port),
-						null, protocol);
+				protocolSetups[i] = new ServerSetup(Integer.valueOf(port), null, protocol);
 			}
 		}
 		return protocolSetups;
 	}
-
-	private boolean isEmpty(final String value) {
-		if (value == null || value.isEmpty()) {
-			return true;
-		} else {
-			return false;
+	
+	private void deleteAllMails() throws RuntimeException {
+		final Iterator<GreenMailUser> it = userMap.values().iterator();		
+		while (it.hasNext()) {
+			final GreenMailUser user = it.next();
+			deleteAllUserMails(user.getEmail());
 		}
 	}
+	
+	private void deleteAllUserMails(String email) throws RuntimeException {
+		final GreenMailUser user = userMap.get(email);
+    	if (user != null) {
+			try {
+				final MailFolder folder = greenMail.getManagers().getImapHostManager().getInbox(user);
+				folder.deleteAllMessages();
+			} catch (Exception ex) {
+				throw new RuntimeException(ex.getMessage(), ex);
+			}
+    	} else {
+    		log.warning("User does not exists with this email address: " + email);
+    	}
+    }
 	
 }

@@ -56,7 +56,7 @@ public class StartupTestCase {
 
 	
 	@Test
-	@MailTest(messageCount = 1, matchSubject = "Wildfly Mail", contentType = "text/plain; charset=us-ascii", verbose = true)
+	@MailTest(expectedMessageCount = 1, expectedSubject = "Wildfly Mail", expectedContentType = "text/plain; charset=us-ascii", clearAllMails = true, verbose = true)
 	public void firstTest() throws Exception {
 		final MimeMessage m = new MimeMessage(mailSession1);
 		final Address from = new InternetAddress("testUser1@noreply");
@@ -72,7 +72,7 @@ public class StartupTestCase {
 	
 
 	@Test
-	@MailTest(messageCount = 1, matchSubject = "JBoss AS 7 Mail", contentType = "text/plain; charset=us-ascii", verbose = true)
+	@MailTest(expectedMessageCount = 1, expectedSubject = "JBoss AS 7 Mail", expectedContentType = "text/plain; charset=us-ascii", clearAllMails = true, verbose = true)
 	public void secondTest() throws Exception {
 		final MimeMessage m = new MimeMessage(mailSession1);
 		final Address from = new InternetAddress("testUser1@noreply");

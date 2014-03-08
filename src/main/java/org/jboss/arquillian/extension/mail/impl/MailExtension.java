@@ -21,6 +21,7 @@ import org.jboss.arquillian.container.test.spi.client.deployment.AuxiliaryArchiv
 import org.jboss.arquillian.core.spi.LoadableExtension;
 import org.jboss.arquillian.extension.mail.impl.client.DeploymentAppender;
 import org.jboss.arquillian.extension.mail.impl.client.MailServerInstaller;
+import org.jboss.arquillian.extension.mail.impl.client.MailTestVerifier;
 
 /**
  * MailExtension
@@ -33,6 +34,7 @@ public class MailExtension implements LoadableExtension {
     @Override
     public void register(ExtensionBuilder builder) {
         builder.observer(MailServerInstaller.class);
+        builder.observer(MailTestVerifier.class);
         builder.service(AuxiliaryArchiveAppender.class,	DeploymentAppender.class);
     }
 }

@@ -1,4 +1,4 @@
-package org.jboss.arquillian.extension.mail.impl.client;
+package org.jboss.arquillian.extension.mail.impl.client.filter;
 
 import java.util.List;
 

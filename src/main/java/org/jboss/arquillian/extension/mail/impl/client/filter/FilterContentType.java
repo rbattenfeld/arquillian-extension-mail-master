@@ -1,4 +1,4 @@
-package org.jboss.arquillian.extension.mail.impl.client;
+package org.jboss.arquillian.extension.mail.impl.client.filter;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -9,9 +9,12 @@ public class FilterContentType extends AbstractFilterMessages {
 	
 	@Override
 	public boolean isAccepted(MimeMessage mimeMessage, MailTest mailTest) throws MessagingException {
-		final Boolean isEqual = equals(mailTest.contentType(), mimeMessage.getContentType());
+		final Boolean isEqual = equals(mailTest.expectedContentType(), mimeMessage.getContentType());
 		if (mailTest.verbose()) {
-			getLogger().info(String.format("Compare contet type: expected: %s in message: %s match result: %s", mailTest.contentType(), mimeMessage.getContentType(), isEqual.toString()));
+			getLogger().info(String.format("Compare contet type. Expected: %s Received: %s match result: %s", 
+					mailTest.expectedContentType(), 
+					mimeMessage.getContentType(), 
+					isEqual.toString()));
 		}
 		return isEqual;
 	}

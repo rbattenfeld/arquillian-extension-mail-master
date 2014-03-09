@@ -18,18 +18,23 @@
 package org.jboss.arquillian.extension.mail.impl;
 
 import org.jboss.arquillian.container.test.spi.RemoteLoadableExtension;
+import org.jboss.arquillian.extension.mail.impl.container.MailTestRetrieverEnricher;
+import org.jboss.arquillian.test.spi.TestEnricher;
 
 /**
- * BytemanRemoteExtension
+ * MailRemoteExtension
  * 
- * @author <a href="mailto:aslak@redhat.com">Aslak Knutsen</a>
+ * @author <a href="mailto:ralf.battenfeld@bluewin.ch">Ralf Battenfeld</a>
  * @version $Revision: $
  */
 public class MailRemoteExtension implements RemoteLoadableExtension {
 
 	@Override
 	public void register(ExtensionBuilder builder) {
-//		builder.observer(AgentInstaller.class).observer(ScriptInstaller.class)
-//				.observer(RuleInstaller.class);
+
+		if (Validate.classExists("org.jboss.arquillian.extension.mail.api.MailRemoteClient")) {
+			builder.service(TestEnricher.class, MailTestRetrieverEnricher.class);
+		}
+
 	}
 }

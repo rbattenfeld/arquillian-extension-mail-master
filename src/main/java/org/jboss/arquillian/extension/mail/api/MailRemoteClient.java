@@ -15,26 +15,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.extension.mail.impl;
+package org.jboss.arquillian.extension.mail.api;
 
-import org.jboss.arquillian.container.test.spi.client.deployment.AuxiliaryArchiveAppender;
-import org.jboss.arquillian.core.spi.LoadableExtension;
-import org.jboss.arquillian.extension.mail.impl.client.MailDeploymentAppender;
-import org.jboss.arquillian.extension.mail.impl.client.MailServerInstaller;
-import org.jboss.arquillian.extension.mail.impl.client.MailTestVerifier;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * MailExtension
+ * Annotation used for injecting a remote retriever client.
  * 
  * @author <a href="mailto:ralf.battenfeld@bluewin.ch">Ralf Battenfeld</a>
- * @version $Revision: $
  */
-public class MailExtension implements LoadableExtension {
-
-    @Override
-    public void register(ExtensionBuilder builder) {
-        builder.observer(MailServerInstaller.class);
-        builder.observer(MailTestVerifier.class);
-        builder.service(AuxiliaryArchiveAppender.class,	MailDeploymentAppender.class);
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.FIELD })
+public @interface MailRemoteClient {
+	
 }

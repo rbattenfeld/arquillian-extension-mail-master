@@ -72,4 +72,10 @@ public @interface MailServerSetup {
 	 * @return
 	 */
 	public String[] users() default "";
+	
+	/**
+     * Allows to activate detailed processing log messages. Useful for checking why a test is failing.
+     * @return if true, then processing log messages are logged.
+     */
+    public boolean verbose() default false;
 }

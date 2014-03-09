@@ -84,7 +84,7 @@ public class MailServerInstaller {
 	private GreenMail setupServer(final MailServerSetup setup) {
 		GreenMail server = null;
 		if (setup.protocols() != null) {
-			final ServerSetup[] serverSetup = getSetup(setup.protocols());
+			final ServerSetup[] serverSetup = getSetup(setup.protocols(), setup.host());
 			server = new GreenMail(serverSetup);
 			server.start();
 		
@@ -109,7 +109,7 @@ public class MailServerInstaller {
 		return server;
 	}
 	
-	private ServerSetup[] getSetup(final String[] protocols) {
+	private ServerSetup[] getSetup(final String[] protocols, final String host) {
 		final ServerSetup[] protocolSetups = new ServerSetup[protocols.length];
 		for (int i = 0; i < protocols.length; i++) {
 			String item = protocols[i];
@@ -117,7 +117,7 @@ public class MailServerInstaller {
 			if (subitem.length == 2) {
 				final String protocol = subitem[0];
 				final String port = subitem[1];
-				protocolSetups[i] = new ServerSetup(Integer.valueOf(port), null, protocol);
+				protocolSetups[i] = new ServerSetup(Integer.valueOf(port), host, protocol);
 			}
 		}
 		return protocolSetups;

@@ -23,7 +23,6 @@ import javax.mail.internet.MimeMessage;
 
 import org.jboss.arquillian.core.api.Event;
 import org.jboss.arquillian.core.api.InstanceProducer;
-import org.jboss.arquillian.core.api.annotation.ApplicationScoped;
 import org.jboss.arquillian.core.api.annotation.Inject;
 import org.jboss.arquillian.core.api.annotation.Observes;
 import org.jboss.arquillian.extension.mail.api.MailTest;
@@ -62,23 +61,20 @@ public class MailTestVerifier {
 	}
 	
 	public void uninstallMethod(@Observes After event) {
-		if (mailTest != null) {
+		if (mailTest != null && mailTest.verifyResult()) {
 			try {
 				final MimeMessage[] messages = greenMailProxy.get().getReceivedMessages();	
 				final FilterChain chain = new FilterChain();						
 				final List<MimeMessage> messagesFiltered = chain.filter(mailTest, messages);
 				if (mailTest.expectedMessageCount() != messagesFiltered.size()) {
-					throw new MailTestAssertionError("Expected");
+					throw new MailTestAssertionError(String.format("Expected mail message count %d but was %d", 
+							mailTest.expectedMessageCount(), messagesFiltered.size()));
 				}				
 			} catch (MessagingException ex) {
 				throw new RuntimeException(ex.getMessage(), ex);
 			}
-			mailTest = null;
 		}
+		mailTest = null;
 	}
-	
-	// -----------------------------------------------------------------------||
-	// -- Private Methods ----------------------------------------------------||
-	// -----------------------------------------------------------------------||
 
 }

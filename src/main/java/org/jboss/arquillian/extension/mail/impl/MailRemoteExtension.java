@@ -18,7 +18,7 @@
 package org.jboss.arquillian.extension.mail.impl;
 
 import org.jboss.arquillian.container.test.spi.RemoteLoadableExtension;
-import org.jboss.arquillian.extension.mail.impl.container.MailTestRetrieverEnricher;
+import org.jboss.arquillian.extension.mail.impl.container.MailTestUtilEnricher;
 import org.jboss.arquillian.test.spi.TestEnricher;
 
 /**
@@ -33,7 +33,7 @@ public class MailRemoteExtension implements RemoteLoadableExtension {
 	public void register(ExtensionBuilder builder) {
 
 		if (Validate.classExists("org.jboss.arquillian.extension.mail.api.MailRemoteClient")) {
-			builder.service(TestEnricher.class, MailTestRetrieverEnricher.class);
+			builder.service(TestEnricher.class, MailTestUtilEnricher.class);
 		}
 
 	}

@@ -35,7 +35,7 @@ public @interface MailServerSetup {
 	public String host() default "localhost";
 	
 	/**
-	 * Defines protocols. The format is [<potocol>:port];[<protocol>:port]...
+	 * Defines protocols. The format is [potocol:port];[protocol:port]...
 	 * <p>
 	 * The supported protocols are:
 	 * <ul>
@@ -61,7 +61,7 @@ public @interface MailServerSetup {
 	 * <p>
 	 * <ul> 
 	 * <li> users = {"email-address1:passwd1", "email-address2:passwd2"} or
-	 * <li> users = {"email-address1:login1:passwd1", "email-address2:login2:passwd2"} or
+	 * <li> users = {"email-address1:login1:passwd1", "email-address2:login2:passwd2"}
 	 * </ul>
 	 * 
 	 * example:
@@ -74,7 +74,7 @@ public @interface MailServerSetup {
 	public String[] users() default "";
 	
 	/**
-     * Allows to activate detailed processing log messages. Useful for checking why a test is failing.
+     * Allows to activate detailed mail session log messages. Useful for checking why a test is failing.
      * @return if true, then processing log messages are logged.
      */
     public boolean verbose() default false;

@@ -46,7 +46,7 @@ public @interface MailTest {
 	 * Defines the expected number of mails after all filters like <code>expectedSubject()</code> are applied.
 	 * @return the expected amount of mails.
 	 */
-    public int expectedMessageCount();
+    public int expectedMessageCount() default -1;
     
     /**
      * Filters mails by the sentTo field. Will be ignored when this field is empty.
@@ -64,7 +64,7 @@ public @interface MailTest {
      * Filters mails by the subject field. Will be ignored when this field is empty.
      * @return the expected subject mail field.
      */
-    public String expectedSubject();
+    public String expectedSubject() default "";
     
     /**
      * Filters mails by the content type field. Will be ignored when this field is empty.
@@ -84,9 +84,9 @@ public @interface MailTest {
      */
     public boolean verbose() default false;
     
-//    /**
-//     * Filters all mails for attachments. --> TODO later
-//     * @return if true, then only mails with an attachment are considered.
-//     */
-//    public boolean checkAttachementExists() default false;
+    /**
+     * Allows to switch on/off automated test of the result.
+     * @return if true, then in the <code>After</code> stage the received mails are verified against the given criteria, otherwise no tests are executed.
+     */
+    public boolean verifyResult() default true;
 }

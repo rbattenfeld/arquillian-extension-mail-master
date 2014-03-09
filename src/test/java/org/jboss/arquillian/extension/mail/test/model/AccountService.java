@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.extension.byteman.test.model;
+package org.jboss.arquillian.extension.mail.test.model;
 
 /**
  * AccountService
@@ -25,7 +25,6 @@ package org.jboss.arquillian.extension.byteman.test.model;
  */
 public class AccountService {
 
-    public void forcedMethodLevelFailure() {
-        // do nothing, should inject exception
+    public void doNothing() {
     }
 }

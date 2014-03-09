@@ -18,21 +18,16 @@ package org.jboss.arquillian.extension.mail.test.local;
 
 import javax.annotation.Resource;
 import javax.mail.Address;
-import javax.mail.Folder;
 import javax.mail.Message;
-import javax.mail.Service;
 import javax.mail.Session;
-import javax.mail.Store;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.extension.byteman.test.model.AccountService;
-import org.jboss.arquillian.extension.mail.api.MailRemoteClient;
-import org.jboss.arquillian.extension.mail.api.MailRetriever;
 import org.jboss.arquillian.extension.mail.api.MailServerSetup;
 import org.jboss.arquillian.extension.mail.api.MailTest;
+import org.jboss.arquillian.extension.mail.test.model.AccountService;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
@@ -58,9 +53,6 @@ public class StartupTestCase {
 
 	@Resource(mappedName = "java:jboss/mail/testMail1")
 	private Session mailSession1;	
-
-	@MailRemoteClient
-	private MailRetriever mailRetriever;
 	
 	@Test
 	@MailTest(expectedMessageCount = 1, expectedSubject = "Wildfly Mail", expectedContentType = "text/plain; charset=us-ascii", clearAllMails = true, verbose = true)
@@ -75,15 +67,8 @@ public class StartupTestCase {
 		m.setSentDate(new java.util.Date());
 		m.setContent("Mail sent from Wildfly ", "text/plain");
 		Transport.send(m);
-		
-//		final Store store = mailSession1.getStore("smtp");
-//		final Folder rootFolder = store.getFolder("INBOX");
-		
-		
-		System.out.println("Size: " + mailRetriever.getReceivedMessages().size());
 	}
 	
-
 	@Test
 	@MailTest(expectedMessageCount = 1, expectedSubject = "JBoss AS 7 Mail", expectedContentType = "text/plain; charset=us-ascii", clearAllMails = true, verbose = true)
 	public void secondTest() throws Exception {

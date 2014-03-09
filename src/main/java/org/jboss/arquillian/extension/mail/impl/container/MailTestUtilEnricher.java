@@ -45,7 +45,7 @@ import com.icegreen.greenmail.util.ServerSetup;
  * 
  * @author <a href="mailto:ralf.battenfeld@bluewin.ch">Ralf Battenfeld</a>
  */
-public class MailTestRetrieverEnricher implements TestEnricher {
+public class MailTestUtilEnricher implements TestEnricher {
 	
 	private static final String ANNOTATION_NAME_REMOTE_CLIENT = "org.jboss.arquillian.extension.mail.api.MailRemoteClient";
 	private static final String ANNOTATION_NAME_SERVER_SETUP = "org.jboss.arquillian.extension.mail.api.MailServerSetup";
@@ -69,7 +69,7 @@ public class MailTestRetrieverEnricher implements TestEnricher {
 					injectClass(testCase);
 				}
 			} catch (Exception e) {
-				log.throwing(MailTestRetrieverEnricher.class.getName(), "enrich", e);
+				log.throwing(MailTestUtilEnricher.class.getName(), "enrich", e);
 			}
 		}
 	}
@@ -128,13 +128,8 @@ public class MailTestRetrieverEnricher implements TestEnricher {
 					try {
 						final ServerSetup[] serverSetups = getSetup(protocols, host);
 						final ServerSetup imapServerSetup = getImapServerSetup(serverSetups);
-						if (imapServerSetup != null) {
-							final Session session = GreenMailUtil.instance().getSession(imapServerSetup);
-							if (setup.verbose()) {
-								session.setDebug(true);
-							}
-							final Store store = session.getStore(ServerSetup.PROTOCOL_IMAP);							
-							final MailFetcher mailFetcher = new MailFetcher(store, imapServerSetup, setup.users());
+						if (imapServerSetup != null) {							
+							final DefaultMailTestUtil mailFetcher = new DefaultMailTestUtil(imapServerSetup, setup.users(), setup.verbose());
 							field.set(testCase, mailFetcher);
 						} else {
 							log.log(Level.WARNING, "No imap server defined. Please define an imap server for fetching mails");

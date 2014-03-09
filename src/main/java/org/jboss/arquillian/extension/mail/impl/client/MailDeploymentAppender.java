@@ -21,11 +21,9 @@ import org.jboss.arquillian.container.test.spi.RemoteLoadableExtension;
 import org.jboss.arquillian.container.test.spi.client.deployment.AuxiliaryArchiveAppender;
 import org.jboss.arquillian.core.api.Instance;
 import org.jboss.arquillian.core.api.annotation.Inject;
-import org.jboss.arquillian.extension.mail.api.MailRemoteClient;
 import org.jboss.arquillian.extension.mail.impl.MailRemoteExtension;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 
 /**
@@ -47,11 +45,11 @@ public class MailDeploymentAppender implements AuxiliaryArchiveAppender {
 				.addPackages(true, "org.jboss.arquillian.extension.mail.api")
 				.addPackages(true, "org.jboss.arquillian.extension.mail.impl.container")
 				.addPackages(true, "com.icegreen.greenmail")
-				.addAsServiceProvider(RemoteLoadableExtension.class, MailRemoteExtension.class)
-				.setManifest(
-                    new StringAsset("Manifest-Version: 1.0\n"
-                            + "Created-By: Arquillian\n"
-                            + "Dependencies: javax.mail.api javax.activation.api\n"));
+				.addAsServiceProvider(RemoteLoadableExtension.class, MailRemoteExtension.class);
+//				.setManifest(
+//                    new StringAsset("Manifest-Version: 1.0\n"
+//                            + "Created-By: Arquillian\n"
+//                            + "Dependencies: javax.mail.api javax.activation.api\n"));
 
 		return jar;
 	}

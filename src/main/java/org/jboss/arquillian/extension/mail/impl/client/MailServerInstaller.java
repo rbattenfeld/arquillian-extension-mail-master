@@ -32,6 +32,7 @@ import org.jboss.arquillian.test.spi.annotation.SuiteScoped;
 import org.jboss.arquillian.test.spi.event.suite.AfterClass;
 import org.jboss.arquillian.test.spi.event.suite.BeforeClass;
 
+import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.store.MailFolder;
 import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.GreenMail;
@@ -58,17 +59,24 @@ public class MailServerInstaller {
 	private Instance<ArquillianDescriptor> descriptorInst;
 
 	public void installClass(@Observes BeforeClass event) {
+		log.info("Starting mail server ...");
 		final MailServerSetup setup = ExtractSetupUtil.extractServerSetupFromTestClass(event);
 		if (setup != null) {
+			log.info("Starting mail server with setup");
 			greenMail = setupServer(setup); 
 			greenMailProxy.set(greenMail);
 		}
+		log.info("Starting mail server done");
 	}
 
 	public void installClass(@Observes AfterClass event) {
+		log.info("Stopping mail server ...");
 		if (greenMail != null) {
 			greenMail.stop();
+		} else {
+			log.info("Stopping mail server ... not started!");
 		}
+		log.info("Stopping mail finished");
 	}
 		
 	public void mailEventListener(@Observes MailTestEvent event) {
@@ -136,8 +144,12 @@ public class MailServerInstaller {
     	if (user != null) {
 			try {
 				final MailFolder folder = greenMail.getManagers().getImapHostManager().getInbox(user);
-				folder.deleteAllMessages();
-			} catch (Exception ex) {
+				if (folder != null) {
+					folder.deleteAllMessages();				
+				}
+			} catch (final FolderException  ex)  {
+				log.warning("No INBOX found for user: " + user.getEmail());
+			} catch (final Exception ex) {
 				throw new RuntimeException(ex.getMessage(), ex);
 			}
     	} else {

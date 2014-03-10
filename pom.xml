@@ -2,13 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-
-	<!-- <parent> -->
-	<!-- <groupId>org.jboss</groupId> -->
-	<!-- <artifactId>jboss-parent</artifactId> -->
-	<!-- <version>8</version> -->
-	<!-- <relativePath /> -->
-	<!-- </parent> -->
+	<parent>
+		<groupId>org.jboss</groupId>
+		<artifactId>jboss-parent</artifactId>
+		<version>8</version>
+		<relativePath />
+	</parent>
 
 	<!-- Model Version -->
 	<modelVersion>4.0.0</modelVersion>
@@ -25,6 +24,53 @@
 	<!-- <developerConnection>scm:git:ssh://github.com/arquillian/arquillian-extension-mail.git</developerConnection> -->
 	<!-- <url>git://github.com/arquillian/arquillian-extension-mail.git</url> -->
 	<!-- </scm> -->
+
+
+	<developers>
+		<developer>
+			<name>Ralf Battenfeld</name>
+			<timezone>UTC+1</timezone>
+			<email>ralf.battenfeld@bluewin.ch</email>
+		</developer>
+	</developers>
+
+	<licenses>
+		<license>
+			<name>GNU Lesser General Public License, Version 2.1</name>
+			<distribution>repo</distribution>
+			<url>http://www.gnu.org/licenses/lgpl-2.1.txt</url>
+		</license>
+	</licenses>
+
+	<repositories>
+		<repository>
+			<id>jboss-public-repository-group</id>
+			<name>JBoss Public Repository Group</name>
+			<url>http://repository.jboss.org/nexus/content/groups/public/</url>
+			<layout>default</layout>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</snapshots>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>jboss-public-repository-group</id>
+			<name>JBoss Public Repository Group</name>
+			<url>http://repository.jboss.org/nexus/content/groups/public/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
 
 	<!-- Properties -->
 	<properties>
@@ -48,6 +94,8 @@
 		<maven.compiler.argument.target>1.5</maven.compiler.argument.target>
 		<maven.compiler.argument.source>1.5</maven.compiler.argument.source>
 
+
+		<jboss.home>${project.basedir}/target/embedded</jboss.home>
 	</properties>
 
 	<dependencyManagement>
@@ -124,7 +172,7 @@
 			<artifactId>mail</artifactId>
 			<version>1.5.0-b01</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>geronimo-spec</groupId>
 			<artifactId>geronimo-spec-javamail</artifactId>
@@ -180,6 +228,127 @@
 
 	<profiles>
 		<profile>
+			<id>jbossas-embedded-wildfly-8</id>
+<!-- 			<activation> -->
+<!-- 				<activeByDefault>true</activeByDefault> -->
+<!-- 			</activation> -->
+			<dependencies>
+				<dependency>
+					<groupId>org.wildfly</groupId>
+					<artifactId>wildfly-arquillian-container-embedded</artifactId>
+					<version>8.0.0.Final</version>
+					<scope>test</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.jboss.spec</groupId>
+					<artifactId>jboss-javaee-6.0</artifactId>
+					<type>pom</type>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-resources-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>copy-resources</id>
+								<phase>process-test-classes</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${basedir}/target/jbossas</outputDirectory>
+									<overwrite>true</overwrite>
+									<resources>
+										<resource>
+											<directory>${jboss.home}</directory>
+											<excludes>
+												<exclude>modules/</exclude>
+											</excludes>
+										</resource>
+									</resources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<!-- Fork every test because it will launch a separate AS instance -->
+							<forkMode>always</forkMode>
+							<systemPropertyVariables>
+								<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+								<jboss.home>${jboss.home}</jboss.home>
+								<module.path>${jboss.home}/modules</module.path>
+							</systemPropertyVariables>
+							<redirectTestOutputToFile>false</redirectTestOutputToFile>
+						</configuration>
+					</plugin>
+				</plugins>
+
+			</build>
+		</profile>
+
+
+		<profile>
+			<id>jbossas-managed-wildfly-8</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>org.wildfly</groupId>
+					<artifactId>wildfly-arquillian-container-managed</artifactId>
+					<version>8.0.0.Final</version>
+				</dependency>
+				<dependency>
+					<groupId>org.jboss.spec</groupId>
+					<artifactId>jboss-javaee-6.0</artifactId>
+					<type>pom</type>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<systemProperties>
+								<jboss.version>8.0.0.Final</jboss.version>
+							</systemProperties>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>unpack</id>
+								<phase>process-test-classes</phase>
+								<goals>
+									<goal>unpack</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.wildfly</groupId>
+											<artifactId>wildfly-dist</artifactId>
+											<version>8.0.0.Final</version>
+											<type>zip</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${project.build.directory}</outputDirectory>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
 			<id>jbossas-remote-wildfly-8</id>
 			<dependencies>
 				<dependency>
@@ -210,168 +379,7 @@
 				</dependency>
 
 			</dependencies>
-
 		</profile>
-		<!-- <profile> -->
-		<!-- <id>arq-jbossas-managed-7</id> -->
-		<!-- <activation> -->
-		<!-- <activeByDefault>true</activeByDefault> -->
-		<!-- </activation> -->
-		<!-- <dependencies> -->
-		<!-- <dependency> -->
-		<!-- <groupId>org.jboss.as</groupId> -->
-		<!-- <artifactId>jboss-as-arquillian-container-managed</artifactId> -->
-		<!-- </dependency> -->
-		<!-- <dependency> -->
-		<!-- <groupId>org.jboss.spec</groupId> -->
-		<!-- <artifactId>jboss-javaee-6.0</artifactId> -->
-		<!-- <type>pom</type> -->
-		<!-- </dependency> -->
-		<!-- </dependencies> -->
-		<!-- <build> -->
-		<!-- <plugins> -->
-		<!-- <plugin> -->
-		<!-- <artifactId>maven-surefire-plugin</artifactId> -->
-		<!-- <configuration> -->
-		<!-- <systemProperties> -->
-		<!-- <jboss.version>${version.jbossas_7}</jboss.version> -->
-		<!-- <path.tools_jar>${path.tools_jar}</path.tools_jar> -->
-		<!-- </systemProperties> -->
-		<!-- <excludes> -->
-		<!-- <exclude>%regex[.*local.*]</exclude> -->
-		<!-- </excludes> -->
-		<!-- </configuration> -->
-		<!-- </plugin> -->
-		<!-- <plugin> -->
-		<!-- <groupId>org.apache.maven.plugins</groupId> -->
-		<!-- <artifactId>maven-dependency-plugin</artifactId> -->
-		<!-- <executions> -->
-		<!-- <execution> -->
-		<!-- <id>unpack</id> -->
-		<!-- <phase>process-test-classes</phase> -->
-		<!-- <goals> -->
-		<!-- <goal>unpack</goal> -->
-		<!-- </goals> -->
-		<!-- <configuration> -->
-		<!-- <artifactItems> -->
-		<!-- <artifactItem> -->
-		<!-- <groupId>org.jboss.as</groupId> -->
-		<!-- <artifactId>jboss-as-dist</artifactId> -->
-		<!-- <version>${version.jbossas_7}</version> -->
-		<!-- <type>zip</type> -->
-		<!-- <overWrite>false</overWrite> -->
-		<!-- <outputDirectory>${project.build.directory}</outputDirectory> -->
-		<!-- </artifactItem> -->
-		<!-- </artifactItems> -->
-		<!-- </configuration> -->
-		<!-- </execution> -->
-		<!-- </executions> -->
-		<!-- </plugin> -->
-		<!-- </plugins> -->
-		<!-- </build> -->
-		<!-- </profile> -->
-
-		<!-- <profile> -->
-		<!-- <id>arq-jbossas-remote-7</id> -->
-		<!-- <dependencies> -->
-		<!-- <dependency> -->
-		<!-- <groupId>org.jboss.as</groupId> -->
-		<!-- <artifactId>jboss-as-arquillian-container-remote</artifactId> -->
-		<!-- </dependency> -->
-		<!-- <dependency> -->
-		<!-- <groupId>org.jboss.spec</groupId> -->
-		<!-- <artifactId>jboss-javaee-6.0</artifactId> -->
-		<!-- <type>pom</type> -->
-		<!-- </dependency> -->
-		<!-- </dependencies> -->
-		<!-- <build> -->
-		<!-- <plugins> -->
-		<!-- <plugin> -->
-		<!-- <artifactId>maven-surefire-plugin</artifactId> -->
-		<!-- <configuration> -->
-		<!-- <excludes> -->
-		<!-- <exclude>%regex[.*local.*]</exclude> -->
-		<!-- </excludes> -->
-		<!-- </configuration> -->
-		<!-- </plugin> -->
-		<!-- </plugins> -->
-		<!-- </build> -->
-		<!-- </profile> -->
-		<!-- <profile> -->
-		<!-- <id>arq-glassfish-embedded-3.1</id> -->
-		<!-- <dependencies> -->
-		<!-- <dependency> -->
-		<!-- <groupId>org.jboss.arquillian.container</groupId> -->
-		<!-- <artifactId>arquillian-glassfish-embedded-3.1</artifactId> -->
-		<!-- <version>${version.arquillian_glassfish}</version> -->
-		<!-- <scope>test</scope> -->
-		<!-- </dependency> -->
-		<!-- <dependency> -->
-		<!-- <groupId>org.glassfish.extras</groupId> -->
-		<!-- <artifactId>glassfish-embedded-all</artifactId> -->
-		<!-- <version>${version.glassfish}</version> -->
-		<!-- <scope>test</scope> -->
-		<!-- </dependency> -->
-		<!-- </dependencies> -->
-		<!-- <build> -->
-		<!-- <plugins> -->
-		<!-- <plugin> -->
-		<!-- <artifactId>maven-surefire-plugin</artifactId> -->
-		<!-- <configuration> -->
-		<!-- <excludes> -->
-		<!-- <exclude>%regex[.*local.*]</exclude> -->
-		<!-- </excludes> -->
-		<!-- </configuration> -->
-		<!-- </plugin> -->
-		<!-- </plugins> -->
-		<!-- </build> -->
-		<!-- </profile> -->
-		<!-- <profile> -->
-		<!-- <id>arq-weld-se</id> -->
-		<!-- <dependencies> -->
-		<!-- <dependency> -->
-		<!-- <groupId>org.jboss.arquillian.container</groupId> -->
-		<!-- <artifactId>arquillian-weld-se-embedded-1.1</artifactId> -->
-		<!-- <version>${version.arquillian_weld}</version> -->
-		<!-- <scope>test</scope> -->
-		<!-- </dependency> -->
-		<!-- <dependency> -->
-		<!-- <groupId>org.jboss.spec</groupId> -->
-		<!-- <artifactId>jboss-javaee-6.0</artifactId> -->
-		<!-- <type>pom</type> -->
-		<!-- </dependency> -->
-		<!-- <dependency> -->
-		<!-- <groupId>org.jboss.weld</groupId> -->
-		<!-- <artifactId>weld-core</artifactId> -->
-		<!-- <version>${version.weld}</version> -->
-		<!-- <scope>test</scope> -->
-		<!-- </dependency> -->
-		<!-- <dependency> -->
-		<!-- <groupId>org.slf4j</groupId> -->
-		<!-- <artifactId>slf4j-log4j12</artifactId> -->
-		<!-- <version>${version.slf4j}</version> -->
-		<!-- <scope>test</scope> -->
-		<!-- </dependency> -->
-		<!-- <dependency> -->
-		<!-- <groupId>log4j</groupId> -->
-		<!-- <artifactId>log4j</artifactId> -->
-		<!-- <version>${version.log4j}</version> -->
-		<!-- <scope>test</scope> -->
-		<!-- </dependency> -->
-		<!-- </dependencies> -->
-		<!-- <build> -->
-		<!-- <plugins> -->
-		<!-- <plugin> -->
-		<!-- <artifactId>maven-surefire-plugin</artifactId> -->
-		<!-- <configuration> -->
-		<!-- <excludes> -->
-		<!-- <exclude>%regex[.*container.*]</exclude> -->
-		<!-- </excludes> -->
-		<!-- </configuration> -->
-		<!-- </plugin> -->
-		<!-- </plugins> -->
-		<!-- </build> -->
-		<!-- </profile> -->
 	</profiles>
 </project>
 

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.extension.mail.test.local;
+package org.jboss.arquillian.extension.mail.test.client;
 
 import javax.annotation.Resource;
 import javax.mail.Address;
@@ -25,6 +25,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.TargetsContainer;
 import org.jboss.arquillian.extension.mail.api.MailServerSetup;
 import org.jboss.arquillian.extension.mail.api.MailTest;
 import org.jboss.arquillian.extension.mail.test.model.AccountService;
@@ -42,16 +43,16 @@ import org.junit.runner.RunWith;
  */
 @RunWith(Arquillian.class)
 @MailServerSetup(protocols = {"smtp:3025", "imap:3026"}, users= {"john.doe@testmail.com:mypasswd", "testUser1@noreply:mypasswd"}, verbose = true)
-public class StartupTestCase {
+public class InternalMailTestCase {
 
-	@Deployment
+	@Deployment // @TargetsContainer("container-1")
 	public static JavaArchive deploy() {
-		return ShrinkWrap.create(JavaArchive.class)
+		return ShrinkWrap.create(JavaArchive.class, "internalMail.jar")
 				.addClass(AccountService.class)
 				.addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
 	}
 
-	@Resource(mappedName = "java:jboss/mail/testMail1")
+	@Resource(mappedName = "java:jboss/mail/Default")
 	private Session mailSession1;	
 	
 	@Test

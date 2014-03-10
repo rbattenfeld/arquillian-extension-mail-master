@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.extension.mail.test.local;
+package org.jboss.arquillian.extension.mail.test.client;
 
 import java.util.List;
 
@@ -23,6 +23,7 @@ import javax.mail.Message;
 import javax.mail.Session;
 
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.TargetsContainer;
 import org.jboss.arquillian.extension.mail.api.MailRemoteClient;
 import org.jboss.arquillian.extension.mail.api.MailServerSetup;
 import org.jboss.arquillian.extension.mail.api.MailTest;
@@ -42,23 +43,23 @@ import org.junit.runner.RunWith;
  */
 @RunWith(Arquillian.class)
 @MailServerSetup(protocols = {"smtp:3025", "imap:3026"}, users= {"john.doe@testmail.com:mypasswd"}, verbose = true)
-public class MailTestUtilTestCase {
+public class ExternalMailTestCase {
 
-	@Deployment
+	@Deployment // @TargetsContainer("container-2")
 	public static JavaArchive deploy() {
-		return ShrinkWrap.create(JavaArchive.class)
+		return ShrinkWrap.create(JavaArchive.class, "externalMail.jar")
 				.addClass(AccountService.class)
 				.addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
 	}
 
-	@Resource(mappedName = "java:jboss/mail/testMail1")
+	@Resource(mappedName = "java:jboss/mail/Default")
 	private Session mailSession;	
 
 	@MailRemoteClient
 	private MailTestUtil mailTestUtil;
 	
 	@Test
-	@MailTest(clearAllMails = true, verifyResult = false)
+	@MailTest(clearAllMails = true, verifyResult = false, verbose = true)
 	public void fetchMessageTest() throws Exception {		
 		mailTestUtil.sendTextEmail("john.doe@testmail.com", "testUser1@noreply", "Wildfly Mail 1", "Mail sent from Wildfly", mailSession);
 		final List<Message> msgs = mailTestUtil.getReceivedMessages();
@@ -74,7 +75,7 @@ public class MailTestUtilTestCase {
 	}	
 
 	@Test
-	@MailTest(clearAllMails = true, verifyResult = false)
+	@MailTest(clearAllMails = true, verifyResult = false, verbose = true)
 	public void fetchMessagesTest() throws Exception {		
 		mailTestUtil.sendTextEmail("john.doe@testmail.com", "testUser1@noreply", "Wildfly Mail 1", "Mail sent from Wildfly", mailSession);
 		mailTestUtil.sendTextEmail("john.doe@testmail.com", "testUser1@noreply", "Wildfly Mail 2", "Mail sent from Wildfly", mailSession);
@@ -92,7 +93,7 @@ public class MailTestUtilTestCase {
 	}	
 	
 	@Test
-	@MailTest(clearAllMails = true, verifyResult = false)
+	@MailTest(clearAllMails = true, verifyResult = false, verbose = true)
 	public void clearAllMailsTest() throws Exception {		
 		final List<Message> msgs = mailTestUtil.getReceivedMessages();
 		if (msgs.size() != 0) {

@@ -23,10 +23,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.mail.Folder;
-import javax.mail.Provider;
-import javax.mail.Session;
-import javax.mail.Store;
 import javax.naming.Context;
 
 import org.jboss.arquillian.core.api.Instance;
@@ -35,9 +31,6 @@ import org.jboss.arquillian.extension.mail.api.MailRemoteClient;
 import org.jboss.arquillian.extension.mail.api.MailServerSetup;
 import org.jboss.arquillian.test.spi.TestEnricher;
 
-import com.icegreen.greenmail.AbstractServer;
-import com.icegreen.greenmail.util.GreenMailUtil;
-import com.icegreen.greenmail.util.Retriever;
 import com.icegreen.greenmail.util.ServerSetup;
 
 /**

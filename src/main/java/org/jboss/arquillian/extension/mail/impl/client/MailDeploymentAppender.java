@@ -46,10 +46,6 @@ public class MailDeploymentAppender implements AuxiliaryArchiveAppender {
 				.addPackages(true, "org.jboss.arquillian.extension.mail.impl.container")
 				.addPackages(true, "com.icegreen.greenmail")
 				.addAsServiceProvider(RemoteLoadableExtension.class, MailRemoteExtension.class);
-//				.setManifest(
-//                    new StringAsset("Manifest-Version: 1.0\n"
-//                            + "Created-By: Arquillian\n"
-//                            + "Dependencies: javax.mail.api javax.activation.api\n"));
 
 		return jar;
 	}

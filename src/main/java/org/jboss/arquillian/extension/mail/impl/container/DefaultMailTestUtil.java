@@ -1,14 +1,11 @@
 package org.jboss.arquillian.extension.mail.impl.container;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -17,13 +14,9 @@ import java.util.logging.Logger;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.mail.Address;
-import javax.mail.FetchProfile;
-import javax.mail.Flags;
-import javax.mail.Flags.Flag;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.Multipart;
 import javax.mail.Part;
 import javax.mail.Session;
 import javax.mail.Store;
@@ -32,7 +25,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import javax.mail.search.FlagTerm;
 import javax.mail.util.SharedByteArrayInputStream;
 
 import org.jboss.arquillian.extension.mail.api.MailTestUtil;
@@ -211,47 +203,6 @@ public class DefaultMailTestUtil implements MailTestUtil {
 			throw new MessagingException(e.getMessage(), e);
 		}
 	}
-
-//	private List<Message> getMessages(final Session session, final String user, final String passwd) throws MessagingException {
-//		final List<Message> mailMsgList = new ArrayList<Message>();
-//		try {
-//			// if (setup.verbose()) {
-//			session.setDebug(true);
-//			// }
-//			final Store store = session.getStore(ServerSetup.PROTOCOL_IMAP);
-//			log.info(String.format("Connecting to %s %d %s %s", imapSetup.getBindAddress(), imapSetup.getPort(), user, passwd));
-//			store.connect(imapSetup.getBindAddress(), imapSetup.getPort(), user, passwd);
-//			final Folder rootFolder = store.getFolder("INBOX");
-//
-//			rootFolder.open(Folder.READ_ONLY);
-//			/* Get the messages which is unread in the Inbox */
-//			Message[] msgs = rootFolder.search(new FlagTerm(new Flags(Flag.SEEN), false));
-//
-//			/* Use a suitable FetchProfile */
-//			final FetchProfile fp = new FetchProfile();
-//			fp.add(FetchProfile.Item.ENVELOPE);
-//			fp.add(FetchProfile.Item.CONTENT_INFO);
-//			fp.add(FetchProfile.Item.SIZE);
-//			rootFolder.fetch(msgs, fp);
-//
-//			// rootFolder.open(Folder.READ_WRITE);
-//			// final Message[] msgs = rootFolder.getMessages();
-//			for (Message msg : msgs) {
-//				try {
-//					MimeMessage clonedMsg = copy(session, msg);
-//				} catch (Exception e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//				mailMsgList.add(new MimeMessage((MimeMessage) msg));
-//			}
-//			return mailMsgList;
-//		} finally {
-//			// if (store.isConnected()) {
-//			// store.close();
-//			// }
-//		}
-//	}
 	
 	private List<Message> getMessages(Folder folder) throws MessagingException {
 		List<Message> ret = new ArrayList<Message>();

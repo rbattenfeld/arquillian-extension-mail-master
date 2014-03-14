@@ -25,9 +25,9 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.TargetsContainer;
 import org.jboss.arquillian.extension.mail.api.MailServerSetup;
 import org.jboss.arquillian.extension.mail.api.MailTest;
+import org.jboss.arquillian.extension.mail.api.MailTestAssertionError;
 import org.jboss.arquillian.extension.mail.test.model.AccountService;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -43,9 +43,9 @@ import org.junit.runner.RunWith;
  */
 @RunWith(Arquillian.class)
 @MailServerSetup(protocols = {"smtp:3025", "imap:3026"}, users= {"john.doe@testmail.com:mypasswd", "testUser1@noreply:mypasswd"}, verbose = true)
-public class InternalMailTestCase {
-
-	@Deployment // @TargetsContainer("container-1")
+public class MailTestWithAutomatedVerificationTestCase {
+	
+	@Deployment
 	public static JavaArchive deploy() {
 		return ShrinkWrap.create(JavaArchive.class, "internalMail.jar")
 				.addClass(AccountService.class)
@@ -54,7 +54,7 @@ public class InternalMailTestCase {
 
 	@Resource(mappedName = "java:jboss/mail/Default")
 	private Session mailSession1;	
-	
+	 	
 	@Test
 	@MailTest(expectedMessageCount = 1, expectedSubject = "Wildfly Mail", expectedContentType = "text/plain; charset=us-ascii", clearAllMails = true, verbose = true)
 	public void firstTest() throws Exception {
@@ -73,6 +73,22 @@ public class InternalMailTestCase {
 	@Test
 	@MailTest(expectedMessageCount = 1, expectedSubject = "JBoss AS 7 Mail", expectedContentType = "text/plain; charset=us-ascii", clearAllMails = true, verbose = true)
 	public void secondTest() throws Exception {
+		final MimeMessage m = new MimeMessage(mailSession1);
+		final Address from = new InternetAddress("testUser1@noreply");
+		final Address[] to = new InternetAddress[] { new InternetAddress("john.doe@testmail.com") };
+
+		m.setFrom(from);
+		m.setRecipients(Message.RecipientType.TO, to);
+		m.setSubject("JBoss AS 7 Mail");
+		m.setSentDate(new java.util.Date());
+		m.setContent("Mail sent from JBoss AS 7", "text/plain");
+		Transport.send(m);
+	}
+	
+
+	@Test(expected = MailTestAssertionError.class)
+	@MailTest(expectedMessageCount = 2, expectedSubject = "JBoss AS 7 Mail", expectedContentType = "text/plain; charset=us-ascii", clearAllMails = true, verbose = true)
+	public void thirdTest() throws Exception {
 		final MimeMessage m = new MimeMessage(mailSession1);
 		final Address from = new InternetAddress("testUser1@noreply");
 		final Address[] to = new InternetAddress[] { new InternetAddress("john.doe@testmail.com") };

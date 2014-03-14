@@ -23,7 +23,6 @@ import javax.mail.Message;
 import javax.mail.Session;
 
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.TargetsContainer;
 import org.jboss.arquillian.extension.mail.api.MailRemoteClient;
 import org.jboss.arquillian.extension.mail.api.MailServerSetup;
 import org.jboss.arquillian.extension.mail.api.MailTest;
@@ -43,7 +42,7 @@ import org.junit.runner.RunWith;
  */
 @RunWith(Arquillian.class)
 @MailServerSetup(protocols = {"smtp:3025", "imap:3026"}, users= {"john.doe@testmail.com:mypasswd"}, verbose = true)
-public class ExternalMailTestCase {
+public class MailTestWithUserVerificationTestCase {
 
 	@Deployment // @TargetsContainer("container-2")
 	public static JavaArchive deploy() {

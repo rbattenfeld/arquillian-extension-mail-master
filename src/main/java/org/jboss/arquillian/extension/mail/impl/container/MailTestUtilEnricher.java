@@ -41,6 +41,7 @@ import com.icegreen.greenmail.util.ServerSetup;
 public class MailTestUtilEnricher implements TestEnricher {
 	
 	private static final String ANNOTATION_NAME_REMOTE_CLIENT = "org.jboss.arquillian.extension.mail.api.MailRemoteClient";
+	
 	private static final String ANNOTATION_NAME_SERVER_SETUP = "org.jboss.arquillian.extension.mail.api.MailServerSetup";
 	
 	private static final Logger log = Logger.getLogger(TestEnricher.class.getName());

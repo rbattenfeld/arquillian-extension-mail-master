@@ -1,7 +1,5 @@
 package org.jboss.arquillian.extension.mail.impl.client;
 
-import java.util.logging.Level;
-
 import javax.mail.Folder;
 import javax.mail.Provider;
 import javax.mail.Session;

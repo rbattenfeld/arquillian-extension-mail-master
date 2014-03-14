@@ -20,6 +20,7 @@ package org.jboss.arquillian.extension.mail.impl.common;
 import org.jboss.arquillian.extension.mail.api.MailServerSetup;
 import org.jboss.arquillian.extension.mail.api.MailTest;
 import org.jboss.arquillian.test.spi.event.suite.ClassLifecycleEvent;
+import org.jboss.arquillian.test.spi.event.suite.Test;
 import org.jboss.arquillian.test.spi.event.suite.TestLifecycleEvent;
 
 /**
@@ -45,6 +46,12 @@ public final class ExtractSetupUtil {
 		return test;
 	}
 
+
+	public static MailTest extractMailTestFromTestMethod(final Test event) {
+		MailTest test = event.getTestMethod().getAnnotation(MailTest.class);
+		return test;
+	}
+	
 	public static MailServerSetup extractServerSetupFromTestMethod(final TestLifecycleEvent event) {
 		MailServerSetup test = event.getTestMethod().getAnnotation(MailServerSetup.class);
 		return test;

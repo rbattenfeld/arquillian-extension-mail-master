@@ -25,13 +25,13 @@ import org.jboss.arquillian.core.api.Event;
 import org.jboss.arquillian.core.api.InstanceProducer;
 import org.jboss.arquillian.core.api.annotation.Inject;
 import org.jboss.arquillian.core.api.annotation.Observes;
+import org.jboss.arquillian.core.spi.EventContext;
 import org.jboss.arquillian.extension.mail.api.MailTest;
 import org.jboss.arquillian.extension.mail.api.MailTestAssertionError;
 import org.jboss.arquillian.extension.mail.impl.client.filter.FilterChain;
 import org.jboss.arquillian.extension.mail.impl.common.ExtractSetupUtil;
 import org.jboss.arquillian.test.spi.annotation.SuiteScoped;
-import org.jboss.arquillian.test.spi.event.suite.After;
-import org.jboss.arquillian.test.spi.event.suite.Before;
+import org.jboss.arquillian.test.spi.event.suite.Test;
 
 import com.icegreen.greenmail.util.GreenMail;
 
@@ -43,25 +43,23 @@ import com.icegreen.greenmail.util.GreenMail;
  */
 public class MailTestVerifier {
 	
-	private MailTest mailTest = null;
-	
 	@Inject @SuiteScoped
 	private InstanceProducer<GreenMail> greenMailProxy;	  	
 
 	@Inject
 	private Event<MailTestEvent> mailTestEvent;
-	  
-	public void installMethod(@Observes Before event) {
-		mailTest = ExtractSetupUtil.extractMailTestFromTestMethod(event);
+	 		
+	public void x(@Observes(precedence = -1) EventContext<Test> context) {
+		final MailTest mailTest = ExtractSetupUtil.extractMailTestFromTestMethod(context.getEvent());
 		if (mailTest != null) {
 			if (mailTest.clearAllMails()) {
 				mailTestEvent.fire(MailTestEvent.DeleteAllMails);
 			}
 		}
-	}
-	
-	public void uninstallMethod(@Observes After event) {
-		if (mailTest != null && mailTest.verifyResult()) {
+		
+	    context.proceed();
+	    
+	    if (mailTest != null && mailTest.verifyResult()) {
 			try {
 				final MimeMessage[] messages = greenMailProxy.get().getReceivedMessages();	
 				final FilterChain chain = new FilterChain();						
@@ -73,8 +71,7 @@ public class MailTestVerifier {
 			} catch (MessagingException ex) {
 				throw new RuntimeException(ex.getMessage(), ex);
 			}
-		}
-		mailTest = null;
+		}	    
 	}
 
 }

@@ -43,7 +43,7 @@ public class MailServerInstallerTest {
 	@Test
 	public void test() {
 		final ServerSetup[] setups = getSetup(new String[] { "imap:3026" }, "localhost");
-		final Session session = GreenMailUtil.instance().getSession(setups[0]);
+		final Session session = GreenMailUtil.getSession(setups[0]);
 		session.setDebug(true);
 		for (Provider provider : session.getProviders()) {
 			if (provider.getProtocol().equals("imap")) {

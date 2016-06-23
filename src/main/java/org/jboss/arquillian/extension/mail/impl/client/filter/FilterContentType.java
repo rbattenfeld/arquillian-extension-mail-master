@@ -14,7 +14,7 @@ public class FilterContentType extends AbstractFilterMessages {
                     contentType = "multipart/mixed;";
                 }
             
-		final Boolean isEqual = equals(mailTest.expectedContentType(), mimeMessage.getContentType());
+		final Boolean isEqual = equals(mailTest.expectedContentType(), contentType);
 		if (mailTest.verbose()) {
 			getLogger().info(String.format("Compare contet type. Expected: %s Received: %s match result: %s", 
 					mailTest.expectedContentType(), 

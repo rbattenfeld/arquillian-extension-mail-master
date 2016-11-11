@@ -5,8 +5,8 @@
 
     <container qualifier="default" default="true">
         <configuration>
-            <property name="jbossHome">target/wildfly-8.0.0.Final</property>
-            <property name="serverConfig">../../../../src/test/resources/standalone-mail-test.xml</property>
+            <property name="chameleonTarget">wildfly:8.2.0.Final:managed</property>
+            <property name="serverConfig">../../../../../../src/test/resources/standalone-mail-test.xml</property>
         </configuration>
     </container>
     

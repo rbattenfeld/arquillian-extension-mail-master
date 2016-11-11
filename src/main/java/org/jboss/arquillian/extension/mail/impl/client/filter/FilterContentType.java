@@ -9,7 +9,12 @@ public class FilterContentType extends AbstractFilterMessages {
 	
 	@Override
 	public boolean isAccepted(MimeMessage mimeMessage, MailTest mailTest) throws MessagingException {
-		final Boolean isEqual = equals(mailTest.expectedContentType(), mimeMessage.getContentType());
+                String contentType = mimeMessage.getContentType();
+                if(contentType.startsWith("multipart/mixed;")){//after this it will contain part info that you never check
+                    contentType = "multipart/mixed;";
+                }
+            
+		final Boolean isEqual = equals(mailTest.expectedContentType(), contentType);
 		if (mailTest.verbose()) {
 			getLogger().info(String.format("Compare contet type. Expected: %s Received: %s match result: %s", 
 					mailTest.expectedContentType(), 

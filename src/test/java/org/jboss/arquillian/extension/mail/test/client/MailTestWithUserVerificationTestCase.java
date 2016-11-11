@@ -46,7 +46,7 @@ public class MailTestWithUserVerificationTestCase {
 
 	@Deployment // @TargetsContainer("container-2")
 	public static JavaArchive deploy() {
-		return ShrinkWrap.create(JavaArchive.class, "externalMail.jar")
+		return ShrinkWrap.create(JavaArchive.class, "test.jar")
 				.addClass(AccountService.class)
 				.addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
 	}
